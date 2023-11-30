@@ -36,8 +36,11 @@ MaterialRecord* createRecord( int id, int factoryNumber, int branchNumber, const
 
 //#############################################Prototype functions####################################//
 
+void saveToTextFile(MaterialRecord* head, const string& filename);
+void saveToBinaryFile(MaterialRecord* head, const string& filename);
 void calculateEndPeriodValueByBranch(MaterialRecord* head);
 void calculateEndPeriodValueByFactory(MaterialRecord* head);
+void calculateTotals(MaterialRecord* head);
 
 //##############################################Record handing###################################//
 
@@ -391,6 +394,19 @@ void releaseMemory(MaterialRecord*& head) {
 }
 
 void exitProgram(MaterialRecord*& head) {
+	cout << "Maybe save Records?(Y=1/N=any symbol + Enter): ";
+	int saveChoice;
+	cin >> saveChoice;
+	if (saveChoice == 1) {
+		cout << "Format?(Bin=1/txt=any key + Enter): ";
+		int formatChoice;
+		cin >> formatChoice;
+		if (formatChoice == 1) {
+			saveToBinaryFile(head, "material_records.bin");
+		} else {
+			saveToTextFile(head, "material_records.txt");
+		}
+	}
 	releaseMemory(head);
 	cout << "Exiting the program. Memory has been freed." << endl;
 	exit(0);
@@ -427,9 +443,62 @@ void searchByLastName(MaterialRecord* head, const string& lastName) {
 }
 
 //##############################################report###################################//
+//void generateReport(MaterialRecord* head) {
+//    calculateEndPeriodValueByBranch(head);
+//    calculateEndPeriodValueByFactory(head);
+//    calculateTotals(head);
+//}
+
 void generateReport(MaterialRecord* head) {
-    calculateEndPeriodValueByBranch(head);
-    calculateEndPeriodValueByFactory(head);
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    int c,i=1;
+    string print_report[6] = { "           Choose Report:",
+							   "Calculate End Period Value by Branch",
+                               "Calculate End Period Value by Factory",
+                               "Calculate Totals",
+                               "Back to Main Menu",
+                               "Exit"
+                              };
+    int int_print_report = 6;
+	while (true) {
+	    do {
+	        for (int j = 0; j < int_print_report; j++) {
+	            if (j == i) {
+	                SetConsoleTextAttribute(hConsole, 10);
+	                cout << " -> " << print_report[j] << endl;
+	            } else
+	                cout << "    " << print_report[j] << endl;
+	            SetConsoleTextAttribute(hConsole, 15);
+	        }
+	        c = getch();
+	        if (c == 115 || c == 80) i++;
+	        if (c == 119 || c == 72) i--;
+	        if (i < 1) i = 1;
+	        if (i > int_print_report - 1) i = int_print_report - 1;
+	        system("cls");
+	    } while (c != 13);
+	
+	    switch (i) {
+	        case 1: {
+	            calculateEndPeriodValueByBranch(head);
+	            break;
+	        }
+	        case 2: {
+	            calculateEndPeriodValueByFactory(head);
+	            break;
+	        }
+	        case 3: {
+	        	calculateTotals(head);
+				break;
+			}
+	        case 4: {
+	            return;
+	        }
+	        case 5: {
+	            exitProgram(head);
+	        }
+	    }
+    }
 }
 
 void calculateEndPeriodValueByBranch(MaterialRecord* head) {
@@ -460,6 +529,10 @@ void calculateEndPeriodValueByBranch(MaterialRecord* head) {
     }
 
     cout << "--------------------------------------" << endl;
+    cout << "-->Press any key to go back<--";
+    getch();
+    system("cls");
+    return;
 }
 
 void calculateEndPeriodValueByFactory(MaterialRecord* head) {
@@ -489,8 +562,43 @@ void calculateEndPeriodValueByFactory(MaterialRecord* head) {
     }
 
     cout << "-----------------------------" << endl;
+    cout << "-->Press any key to go back<--";
+    getch();
+    system("cls");
+    return;
 }
 
+void calculateTotals(MaterialRecord* head) {
+    double startValueTotal = 0.0;
+    double receivedValueTotal = 0.0;
+    double disposedValueTotal = 0.0;
+    double endPeriodValueTotal = 0.0;
+
+    MaterialRecord* current = head;
+
+    while (current != nullptr) {
+        startValueTotal += current->startValue;
+        receivedValueTotal += current->receivedValue;
+        disposedValueTotal += current->disposedValue;
+        endPeriodValueTotal += (current->startValue + current->receivedValue - current->disposedValue);
+
+        current = current->next;
+    }
+
+    cout << "Totals:" << endl;
+    cout << "-----------------------------" << endl;
+    cout << "| Type        | Total Value |" << endl;
+    cout << "-----------------------------" << endl;
+    cout << "| Start Value | " << setw(11) << startValueTotal << " |" << endl;
+    cout << "| Received    | " << setw(11) << receivedValueTotal << " |" << endl;
+    cout << "| Disposed    | " << setw(11) << disposedValueTotal << " |" << endl;
+    cout << "| End Period  | " << setw(11) << endPeriodValueTotal << " |" << endl;
+    cout << "-----------------------------" << endl;
+    cout << "-->Press any key to go back<--";
+    getch();
+    system("cls");
+    return;
+}
 
 int main() {
 	MaterialRecord* records = nullptr; // голова списка записей
@@ -501,10 +609,11 @@ int main() {
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
 	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+	system("cls");
 
-	int c,i=0;
+	int c,i=1;
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	string print_main[14]= {"Menu:","View Records","Add Record","Delete Record","Edit Record",
+	string print_main[14]= {"            Menu:","View Records","Add Record","Delete Record","Edit Record",
 	                        "Save Records to file.txt","Save Records to file.bin","Load Records from file.txt","Load Records from file.bin",
 	                        "Sort Records","Search by LastName","Clear Records","Generate Report","Exit"
 	                       };
@@ -522,10 +631,10 @@ int main() {
 			c=getch();
 			if(c==115 || c==80) i++;
 			if(c==119 || c==72) i--;
-			if(i<0) i=0;
+			if(i<1) i=1;
 			if(i>int_print_main-1) i=int_print_main-1;
 			system("cls");
-		} while(c!=13);
+		} while(c!= int_print_main - 1);
 
 
 		switch (i) {
@@ -605,7 +714,10 @@ int main() {
 			}
 			case 11: {
 				releaseMemory(records);
-				cout << "Records has been cleared.";
+				cout << "Records has been cleared." <<endl;
+				cout << "-->Press any key to go back<--";
+    			getch();
+    			system("cls");
 				break;
 			}
 			case 12: {
@@ -613,19 +725,6 @@ int main() {
 				break;
 			}
 			case 13: {
-				cout << "Maybe save Records?(Y=1/N=any symbol + Enter): ";
-				int saveChoice;
-				cin >> saveChoice;
-				if (saveChoice == 1) {
-					cout << "Format?(Bin=1/txt=any key + Enter): ";
-					int formatChoice;
-					cin >> formatChoice;
-					if (formatChoice == 1) {
-						saveToBinaryFile(records, "material_records.bin");
-					} else {
-						saveToTextFile(records, "material_records.txt");
-					}
-				}
 				exitProgram(records);
 			}
 		}
