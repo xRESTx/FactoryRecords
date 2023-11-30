@@ -36,180 +36,8 @@ MaterialRecord* createRecord( int id, int factoryNumber, int branchNumber, const
 
 //#############################################Prototype functions####################################//
 
-void idCheck(MaterialRecord*& head, int& id);
-void addRecord(MaterialRecord*& head, MaterialRecord* newRecord);
-void displayRecords(MaterialRecord* head);
-void deleteRecord(MaterialRecord*& head, int idToDelete);
-void editRecord(MaterialRecord* head, int idToEdit);
-
-void saveToTextFile(MaterialRecord* head, const string& filename);
-void saveToBinaryFile(MaterialRecord* head, const char* filename);
-void loadFromTextFile(MaterialRecord*& head, const string& filename);
-void loadFromBinaryFile(MaterialRecord*& head, const string& filename)
-
-bool compareByColumn(const MaterialRecord& a, const MaterialRecord& b, int column);
-void swap(MaterialRecord* a, MaterialRecord* b);
-void sortRecords(MaterialRecord*& head, int column);
-
-void releaseMemory(MaterialRecord*& head);
-void exitProgram(MaterialRecord*& head);
-
-void searchByLastName(MaterialRecord* head, const string& lastName);
-
-void generateReport(MaterialRecord* head);
 void calculateEndPeriodValueByBranch(MaterialRecord* head);
 void calculateEndPeriodValueByFactory(MaterialRecord* head);
-
-//#############################################MAIN####################################//
-
-int main() {
-	MaterialRecord* records = nullptr; // голова списка записей
-
-	// defoltnoe(стартовое) заполнение таблицы
-	addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
-	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
-	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
-	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
-
-	int c,i=0;
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	string print_main[14]= {"Menu:","View Records","Add Record","Delete Record","Edit Record",
-	                        "Save Records to file.txt","Save Records to file.bin","Load Records from file.txt","Load Records from file.bin",
-	                        "Sort Records","Search by LastName","Clear Records","Generate Report","Exit"
-	                       };
-	int int_print_main = 14;
-	while(true) {
-		do {
-			for(int j=0; j<int_print_main; j++) {
-				if(j==i) {
-					SetConsoleTextAttribute(hConsole, 10);
-					cout<<" -> "<<print_main[j]<<endl;
-				} else
-					cout<<"    "<<print_main[j]<<endl;
-				SetConsoleTextAttribute(hConsole, 15);
-			}
-			c=getch();
-			if(c==115 || c==80) i++;
-			if(c==119 || c==72) i--;
-			if(i<0) i=0;
-			if(i>int_print_main-1) i=int_print_main-1;
-			system("cls");
-		} while(c!=13);
-
-
-		switch (i) {
-			case 1: {
-				cout << "\nMaterial Records:" << endl;
-				displayRecords(records);
-				break;
-			}
-			case 2: {
-				int id, factory, branch;
-				string lastName;
-				double start, received, disposed;
-				
-				cout << "Enter ID: ";
-				cin >> id;
-				idCheck(records, id);
-				cout << "Enter Factory Number: ";
-				cin >> factory;
-				cout << "Enter Branch Number: ";
-				cin >> branch;
-				cout << "Enter Last Name: ";
-				cin >> lastName;
-				cout << "Enter Start Value: ";
-				cin >> start;
-				cout << "Enter Received Value: ";
-				cin >> received;
-				cout << "Enter Disposed Value: ";
-				cin >> disposed;
-				
-				addRecord(records, createRecord(id, factory, branch, lastName, start, received, disposed));
-				break;
-			}
-			case 3: {
-				int idToDelete;
-				cout << "Enter ID of the record to delete: ";
-				cin >> idToDelete;
-				deleteRecord(records, idToDelete);
-				break;
-			}
-			case 4: {
-				int idToEdit;
-				cout << "Enter ID of the record to edit: ";
-				cin >> idToEdit;
-				editRecord(records, idToEdit);
-				break;
-			}
-			case 5: {
-				saveToTextFile(records, "material_records.txt");
-				break;
-			}
-			case 6: {
-				saveToBinaryFile(records, "material_records.bin");
-				break;
-			}
-			case 7: {
-				loadFromTextFile(records, "material_records.txt");
-				break;
-			}
-			case 8: {
-				loadFromBinaryFile(records, "material_records.bin");
-				break;
-			}
-			case 9: {
-				int columnSort;
-				cout << "(1)ID (2)Factory (3)Branch (4)Last Name (5)Start Value (6)Received Value (7)Disposed Value \n";
-				cout << "Enter number column for sort: ";
-				cin >> columnSort;
-				sortRecords(records, columnSort);
-				break;
-			}
-			case 10: {
-				string searchLastName;
-				cout << "Enter Last Name to search: ";
-				cin >> searchLastName;
-				searchByLastName(records, searchLastName);
-				break;
-			}
-			case 11: {
-				releaseMemory(records);
-				cout << "Records has been cleared.";
-				break;
-			}
-			case 12: {
-				generateReport(records);
-				break;
-			}
-			case 13: {
-				cout << "Maybe save Records?(Y=1/N=any symbol + Enter): ";
-				int saveChoice;
-				cin >> saveChoice;
-				if (saveChoice == 1) {
-					cout << "Format?(Bin=1/txt=any key + Enter): ";
-					int formatChoice;
-					cin >> formatChoice;
-					if (formatChoice == 1) {
-						saveToBinaryFile(records, "material_records.bin");
-					} else {
-						saveToTextFile(records, "material_records.txt");
-					}
-				}
-				exitProgram(records);
-			}
-		}
-	}
-}
-
-
-
-
-
-
-
-
-
 
 //##############################################Record handing###################################//
 
@@ -661,4 +489,145 @@ void calculateEndPeriodValueByFactory(MaterialRecord* head) {
     }
 
     cout << "-----------------------------" << endl;
+}
+
+
+int main() {
+	MaterialRecord* records = nullptr; // голова списка записей
+
+	// defoltnoe(стартовое) заполнение таблицы
+	addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+
+	int c,i=0;
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	string print_main[14]= {"Menu:","View Records","Add Record","Delete Record","Edit Record",
+	                        "Save Records to file.txt","Save Records to file.bin","Load Records from file.txt","Load Records from file.bin",
+	                        "Sort Records","Search by LastName","Clear Records","Generate Report","Exit"
+	                       };
+	int int_print_main = 14;
+	while(true) {
+		do {
+			for(int j=0; j<int_print_main; j++) {
+				if(j==i) {
+					SetConsoleTextAttribute(hConsole, 10);
+					cout<<" -> "<<print_main[j]<<endl;
+				} else
+					cout<<"    "<<print_main[j]<<endl;
+				SetConsoleTextAttribute(hConsole, 15);
+			}
+			c=getch();
+			if(c==115 || c==80) i++;
+			if(c==119 || c==72) i--;
+			if(i<0) i=0;
+			if(i>int_print_main-1) i=int_print_main-1;
+			system("cls");
+		} while(c!=13);
+
+
+		switch (i) {
+			case 1: {
+				cout << "\nMaterial Records:" << endl;
+				displayRecords(records);
+				break;
+			}
+			case 2: {
+				int id, factory, branch;
+				string lastName;
+				double start, received, disposed;
+				
+				cout << "Enter ID: ";
+				cin >> id;
+				idCheck(records, id);
+				cout << "Enter Factory Number: ";
+				cin >> factory;
+				cout << "Enter Branch Number: ";
+				cin >> branch;
+				cout << "Enter Last Name: ";
+				cin >> lastName;
+				cout << "Enter Start Value: ";
+				cin >> start;
+				cout << "Enter Received Value: ";
+				cin >> received;
+				cout << "Enter Disposed Value: ";
+				cin >> disposed;
+				
+				addRecord(records, createRecord(id, factory, branch, lastName, start, received, disposed));
+				break;
+			}
+			case 3: {
+				int idToDelete;
+				cout << "Enter ID of the record to delete: ";
+				cin >> idToDelete;
+				deleteRecord(records, idToDelete);
+				break;
+			}
+			case 4: {
+				int idToEdit;
+				cout << "Enter ID of the record to edit: ";
+				cin >> idToEdit;
+				editRecord(records, idToEdit);
+				break;
+			}
+			case 5: {
+				saveToTextFile(records, "material_records.txt");
+				break;
+			}
+			case 6: {
+				saveToBinaryFile(records, "material_records.bin");
+				break;
+			}
+			case 7: {
+				loadFromTextFile(records, "material_records.txt");
+				break;
+			}
+			case 8: {
+				loadFromBinaryFile(records, "material_records.bin");
+				break;
+			}
+			case 9: {
+				int columnSort;
+				cout << "(1)ID (2)Factory (3)Branch (4)Last Name (5)Start Value (6)Received Value (7)Disposed Value \n";
+				cout << "Enter number column for sort: ";
+				cin >> columnSort;
+				sortRecords(records, columnSort);
+				break;
+			}
+			case 10: {
+				string searchLastName;
+				cout << "Enter Last Name to search: ";
+				cin >> searchLastName;
+				searchByLastName(records, searchLastName);
+				break;
+			}
+			case 11: {
+				releaseMemory(records);
+				cout << "Records has been cleared.";
+				break;
+			}
+			case 12: {
+				generateReport(records);
+				break;
+			}
+			case 13: {
+				cout << "Maybe save Records?(Y=1/N=any symbol + Enter): ";
+				int saveChoice;
+				cin >> saveChoice;
+				if (saveChoice == 1) {
+					cout << "Format?(Bin=1/txt=any key + Enter): ";
+					int formatChoice;
+					cin >> formatChoice;
+					if (formatChoice == 1) {
+						saveToBinaryFile(records, "material_records.bin");
+					} else {
+						saveToTextFile(records, "material_records.txt");
+					}
+				}
+				exitProgram(records);
+			}
+		}
+	}
 }
