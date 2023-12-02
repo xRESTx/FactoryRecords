@@ -72,20 +72,74 @@ void addRecord(MaterialRecord*& head, MaterialRecord* newRecord) {
 	cout << "Record added successfully!" << endl;
 }
 
+int countRecords(MaterialRecord* head) {
+    int count = 0;
+    MaterialRecord* current = head;
+
+    while (current != nullptr) {
+        count++;
+        current = current->next;
+    }
+
+    return count;
+}
+
 void displayRecords(MaterialRecord* head) {
-	cout << "----------------------------------------------------------------------------------------------" << endl;
-	cout << "|   ID   | Factory | Branch |   Last Name   | Start Value  | Received Value | Disposed Value |" << endl;
-	cout << "----------------------------------------------------------------------------------------------" << endl;
-	MaterialRecord* current = head;
-	while (current != nullptr) {
-//		cout << "| " << setw(6) << current->id << " | " << setw(7) << current->factoryNumber << " | " << setw(6) << current->branchNumber << " | " << setw(13) << current->LastName << " | " << setw(14) << current->startValue << " | " << setw(16) << current->receivedValue << " | " << setw(16) << current->disposedValue << " |"<< endl;
-		printf("| %6d | %7d | %6d | %13s | %12.2f | %14.2f | %14.2f |\n", current->id, current->factoryNumber,
+    int currentPage = 1;
+    int itemsPerPage = 20;
+    char c = 0;
+    int maxPage = countRecords(head);
+    MaterialRecord* current = head;
+
+    do {
+        system("cls");
+        printf("Current Page: %d\n", currentPage);
+		cout << "----------------------------------------------------------------------------------------------" << endl;
+		cout << "|   ID   | Factory | Branch |   Last Name   | Start Value  | Received Value | Disposed Value |" << endl;
+		cout << "----------------------------------------------------------------------------------------------" << endl;
+        int count = 0;
+        while (current != nullptr && count < itemsPerPage) {
+            printf("| %6d | %7d | %6d | %13s | %12.2f | %14.2f | %14.2f |\n", current->id, current->factoryNumber,
 		       current->branchNumber, current->LastName.c_str(), current->startValue, current->receivedValue,
 		       current->disposedValue);
-		current = current->next;
-	}
-	cout << "----------------------------------------------------------------------------------------------" << endl;
+            current = current->next;
+            count++;
+        }
+
+        printf("\nPress 'w' for previous page, 's' for next page, or any other key to exit: ");
+
+        c = getch();
+
+        if ((c==115 || c==80) && current != nullptr) {
+            currentPage++;
+        } else if ((c==119 || c==72) && currentPage > 1) {
+            currentPage--;
+            MaterialRecord* temp = head;
+            for (int i = 1; i < (currentPage - 1) * itemsPerPage; ++i) {
+                temp = temp->next;
+            }
+            current = temp;
+        } else {
+        	break;
+		}
+    }while (c!=13);
 }
+
+
+//void displayRecords(MaterialRecord* head) {
+//	cout << "----------------------------------------------------------------------------------------------" << endl;
+//	cout << "|   ID   | Factory | Branch |   Last Name   | Start Value  | Received Value | Disposed Value |" << endl;
+//	cout << "----------------------------------------------------------------------------------------------" << endl;
+//	MaterialRecord* current = head;
+//	while (current != nullptr) {
+////		cout << "| " << setw(6) << current->id << " | " << setw(7) << current->factoryNumber << " | " << setw(6) << current->branchNumber << " | " << setw(13) << current->LastName << " | " << setw(14) << current->startValue << " | " << setw(16) << current->receivedValue << " | " << setw(16) << current->disposedValue << " |"<< endl;
+//		printf("| %6d | %7d | %6d | %13s | %12.2f | %14.2f | %14.2f |\n", current->id, current->factoryNumber,
+//		       current->branchNumber, current->LastName.c_str(), current->startValue, current->receivedValue,
+//		       current->disposedValue);
+//		current = current->next;
+//	}
+//	cout << "----------------------------------------------------------------------------------------------" << endl;
+//}
 
 void deleteRecord(MaterialRecord*& head, int idToDelete) {
 	if (head == nullptr) {
@@ -312,21 +366,19 @@ void loadFromBinaryFile(MaterialRecord*& head, const char* filename) {
 bool compareByColumn(const MaterialRecord& a, const MaterialRecord& b, int column) {
 	switch (column) {
 		case 1:
-			return a.id < b.id;
+			return a.id > b.id;
 		case 2:
-			return a.factoryNumber < b.factoryNumber;
+			return a.factoryNumber > b.factoryNumber;
 		case 3:
-			return a.branchNumber < b.branchNumber;
+			return a.branchNumber > b.branchNumber;
 		case 4:
-			return a.LastName < b.LastName;
+			return a.LastName > b.LastName;
 		case 5:
-			return a.startValue < b.startValue;
+			return a.startValue > b.startValue;
 		case 6:
-			return a.receivedValue < b.receivedValue;
+			return a.receivedValue > b.receivedValue;
 		case 7:
-			return a.disposedValue < b.disposedValue;
-		default:
-			return a.id < b.id; // По умолчанию сортируем по ID
+			return a.disposedValue > b.disposedValue;
 	}
 }
 
@@ -379,8 +431,41 @@ void sortRecords(MaterialRecord*& head, int column) {
 		}
 		last = current;
 	} while (swapped);
-
-	cout << "Records sorted by column " << column << " within the list successfully!" << endl;
+	string column_print;
+	switch (column) {
+		case 1: {
+			column_print = "id";
+			break;
+		}
+		case 2: {
+			column_print = "Factory Number";
+			break;
+		}
+		case 3: {
+			column_print = "Brunch Number";
+			break;
+		}
+		case 4: {
+			column_print = "LastName";
+			break;
+		}
+		case 5: {
+			column_print = "Start Value";
+			break;
+		}
+		case 6: {
+			column_print = "Received Value";
+			break;
+		}
+		case 7: {
+			column_print = "Disposed Value";	
+			break;
+		}
+	}
+	cout << "Records sorted by column " << column_print << " within the list successfully!" << endl;
+	cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
 }
 
 //##############################################clear memory###################################//
@@ -440,6 +525,9 @@ void searchByLastName(MaterialRecord* head, const string& lastName) {
 	} else {
 		cout << "--------------------------------------------------------------------------------------------------------------" << endl;
 	}
+	cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
 }
 
 //##############################################report###################################//
@@ -609,6 +697,46 @@ int main() {
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
 	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(111111, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(222222, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
+		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
+	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
+	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 	system("cls");
 
 	int c,i=1;
@@ -634,7 +762,7 @@ int main() {
 			if(i<1) i=1;
 			if(i>int_print_main-1) i=int_print_main-1;
 			system("cls");
-		} while(c!= int_print_main - 1);
+		} while(c!= 13);
 
 
 		switch (i) {
