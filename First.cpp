@@ -38,6 +38,9 @@ MaterialRecord* createRecord( int id, int factoryNumber, int branchNumber, const
 
 void saveToTextFile(MaterialRecord* head, const string& filename);
 void saveToBinaryFile(MaterialRecord* head, const string& filename);
+void loadFromTextFile(MaterialRecord*& head, const string& filename);
+void loadFromBinaryFile(MaterialRecord*& head, const char* filename);
+
 void calculateEndPeriodValueByBranch(MaterialRecord* head);
 void calculateEndPeriodValueByFactory(MaterialRecord* head);
 void calculateTotals(MaterialRecord* head);
@@ -72,23 +75,23 @@ void addRecord(MaterialRecord*& head, MaterialRecord* newRecord) {
 	cout << "Record added successfully!" << endl;
 }
 
-int countRecords(MaterialRecord* head) {
-    int count = 0;
-    MaterialRecord* current = head;
-
-    while (current != nullptr) {
-        count++;
-        current = current->next;
-    }
-
-    return count;
-}
+//int countRecords(MaterialRecord* head) {
+//    int count = 0;
+//    MaterialRecord* current = head;
+//
+//    while (current != nullptr) {
+//        count++;
+//        current = current->next;
+//    }
+//
+//    return count;
+//}
 
 void displayRecords(MaterialRecord* head) {
     int currentPage = 1;
     int itemsPerPage = 20;
     char c = 0;
-    int maxPage = countRecords(head);
+//    int maxPage = countRecords(head);
     MaterialRecord* current = head;
 
     do {
@@ -106,21 +109,38 @@ void displayRecords(MaterialRecord* head) {
             count++;
         }
 
-        printf("\nPress 'w' for previous page, 's' for next page, or any other key to exit: ");
+        printf("\nPress 'w' for previous page, 's' for next page, 'Enter' to exit: ");
 
         c = getch();
 
-        if ((c==115 || c==80) && current != nullptr) {
+
+        if (c==115 || c==80)  {
             currentPage++;
-        } else if ((c==119 || c==72) && currentPage > 1) {
-            currentPage--;
+			if (current == nullptr) {
+                currentPage --;
+            }
             MaterialRecord* temp = head;
-            for (int i = 1; i < (currentPage - 1) * itemsPerPage; ++i) {
+            for (int i = 1; i < (currentPage - 1) * itemsPerPage; i++) {
+                temp = temp->next;
+            }
+            current = temp;
+        } else if (c==119 || c==72) {
+            currentPage--;
+			if (currentPage < 1) {
+                currentPage = 1;
+            }
+            MaterialRecord* temp = head;
+            for (int i = 1; i < (currentPage - 1) * itemsPerPage; i++) {
                 temp = temp->next;
             }
             current = temp;
         } else {
-        	break;
+        	currentPage = currentPage;
+        	MaterialRecord* temp = head;
+            for (int i = 1; i < (currentPage - 1) * itemsPerPage; i++) {
+                temp = temp->next;
+            }
+            current = temp;
 		}
     }while (c!=13);
 }
@@ -194,12 +214,19 @@ void editRecord(MaterialRecord* head, int idToEdit) {
 			cin >> current->disposedValue;
 
 			cout << "Record updated successfully!" << endl;
+			cout << "-->Press any key to go back<--";
+			getch();
+			system("cls");
 			return;
 		}
 		current = current->next;
 	}
 
 	cout << "Record with ID " << idToEdit << " not found!" << endl;
+	cout << "Please enter a new ID: ";
+	cin >> idToEdit;
+	system("cls");
+	editRecord(head, idToEdit);
 }
 
 //##############################################rabota s failami###################################//
@@ -221,6 +248,9 @@ void saveToTextFile(MaterialRecord* head, const string& filename) {
 
 	file.close();
 	cout << "Data saved to text file successfully!" << endl;
+    cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
 }
 
 void saveToBinaryFile(MaterialRecord* head, const char* filename) {
@@ -239,6 +269,9 @@ void saveToBinaryFile(MaterialRecord* head, const char* filename) {
 
     fclose(file); // Закрытие файла
     cout << "Data saved to binary file successfully!" << endl;
+    cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
 }
 //void saveToBinaryFile(MaterialRecord* head, const string& filename) {
 //	ofstream file(filename, ios::binary);
@@ -292,6 +325,9 @@ void loadFromTextFile(MaterialRecord*& head, const string& filename) {
 
 	file.close();
 	cout << "Data loaded from text file successfully!" << endl;
+    cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
 }
 
 void loadFromBinaryFile(MaterialRecord*& head, const char* filename) {
@@ -326,6 +362,9 @@ void loadFromBinaryFile(MaterialRecord*& head, const char* filename) {
 
     fclose(file); // Закрытие файла
     cout << "Data loaded from binary file successfully!" << endl;
+    cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
 }
 
 //void loadFromBinaryFile(MaterialRecord*& head, const string& filename) {
@@ -462,6 +501,7 @@ void sortRecords(MaterialRecord*& head, int column) {
 			break;
 		}
 	}
+	system("cls");
 	cout << "Records sorted by column " << column_print << " within the list successfully!" << endl;
 	cout << "-->Press any key to go back<--";
 	getch();
@@ -691,6 +731,13 @@ void calculateTotals(MaterialRecord* head) {
 int main() {
 	MaterialRecord* records = nullptr; // голова списка записей
 
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD NewSBSize;
+    NewSBSize.X = 50; // Ширина
+    NewSBSize.Y = 100; // Высота
+
+    SetConsoleScreenBufferSize(hOut, NewSBSize);
+
 	// defoltnoe(стартовое) заполнение таблицы
 	addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
@@ -769,6 +816,7 @@ int main() {
 			case 1: {
 				cout << "\nMaterial Records:" << endl;
 				displayRecords(records);
+				system("cls");
 				break;
 			}
 			case 2: {
