@@ -45,6 +45,9 @@ void calculateEndPeriodValueByBranch(MaterialRecord* head);
 void calculateEndPeriodValueByFactory(MaterialRecord* head);
 void calculateTotals(MaterialRecord* head);
 
+void displayRecords(MaterialRecord* head);
+
+void sortRecords(MaterialRecord*& head);
 //##############################################Record handing###################################//
 
 void idCheck(MaterialRecord*& head, int& id) {
@@ -73,6 +76,7 @@ void addRecord(MaterialRecord*& head, MaterialRecord* newRecord) {
 		temp->next = newRecord;
 	}
 	cout << "Record added successfully!" << endl;
+
 }
 
 //int countRecords(MaterialRecord* head) {
@@ -188,6 +192,7 @@ void deleteRecord(MaterialRecord*& head, int idToDelete) {
 	}
 
 	cout << "Record with ID " << idToDelete << " not found!" << endl;
+	
 }
 
 void editRecord(MaterialRecord* head, int idToEdit) {
@@ -402,7 +407,7 @@ void loadFromBinaryFile(MaterialRecord*& head, const char* filename) {
 
 //##############################################sortirovka###################################//
 
-bool compareByColumn(const MaterialRecord& a, const MaterialRecord& b, int column) {
+bool compareByColumnUp(const MaterialRecord& a, const MaterialRecord& b, int column) {
 	switch (column) {
 		case 1:
 			return a.id > b.id;
@@ -418,6 +423,25 @@ bool compareByColumn(const MaterialRecord& a, const MaterialRecord& b, int colum
 			return a.receivedValue > b.receivedValue;
 		case 7:
 			return a.disposedValue > b.disposedValue;
+	}
+}
+
+bool compareByColumnDown(const MaterialRecord& a, const MaterialRecord& b, int column) {
+	switch (column) {
+		case 1:
+			return a.id < b.id;
+		case 2:
+			return a.factoryNumber < b.factoryNumber;
+		case 3:
+			return a.branchNumber < b.branchNumber;
+		case 4:
+			return a.LastName < b.LastName;
+		case 5:
+			return a.startValue < b.startValue;
+		case 6:
+			return a.receivedValue < b.receivedValue;
+		case 7:
+			return a.disposedValue < b.disposedValue;
 	}
 }
 
@@ -447,65 +471,164 @@ void swap(MaterialRecord* a, MaterialRecord* b) {
 	b->disposedValue = tempDisposed;
 }
 
-void sortRecords(MaterialRecord*& head, int column) {
+void sortRecords(MaterialRecord*& head) {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	
 	if (head == nullptr || head->next == nullptr) {
 		cout << "List has zero or one element. No need for sorting." << endl;
 		return;
 	}
-
-	bool swapped;
-	MaterialRecord* current;
-	MaterialRecord* last = nullptr;
-
-	do {
-		swapped = false;
-		current = head;
-
-		while (current->next != last) {
-			if (compareByColumn(*current, *(current->next), column)) {
-				swap(current, current->next);
-				swapped = true;
-			}
-			current = current->next;
+	string column_sort;
+	int c;
+	int column = 1;
+	string print_sort[14]= {"            Sort:","ID","Factory","Branch","Last Name","Start Value","Received Value","Disposed Value","Back to Main Menu"};
+	int int_print_sort = 9;
+	do{
+	for(int j=0; j<int_print_sort; j++) {
+		if(j==column) {
+			SetConsoleTextAttribute(hConsole, 10);
+			cout<<" -> "<<print_sort[j]<<endl;
+		} else
+			cout<<"    "<<print_sort[j]<<endl;
+			SetConsoleTextAttribute(hConsole, 15);
 		}
-		last = current;
-	} while (swapped);
-	string column_print;
+		c=getch();
+		if(c==115 || c==80) column++;
+		if(c==119 || c==72) column--;
+		if(column<1) column=1;
+		if(column>int_print_sort-1) column=int_print_sort-1;
+		system("cls");
+	} while(c!= 13);
+	
 	switch (column) {
 		case 1: {
-			column_print = "id";
+			column_sort = "id";
 			break;
 		}
 		case 2: {
-			column_print = "Factory Number";
+			column_sort = "Factory Number";
 			break;
 		}
 		case 3: {
-			column_print = "Brunch Number";
+			column_sort = "Brunch Number";
 			break;
 		}
 		case 4: {
-			column_print = "LastName";
+			column_sort = "LastName";
 			break;
 		}
 		case 5: {
-			column_print = "Start Value";
+			column_sort = "Start Value";
 			break;
 		}
 		case 6: {
-			column_print = "Received Value";
+			column_sort = "Received Value";
 			break;
 		}
 		case 7: {
-			column_print = "Disposed Value";	
+			column_sort = "Disposed Value";	
 			break;
 		}
 	}
+	
+	if (column == 8){
+		return;
+	}
+	bool swapped;
+	MaterialRecord* current;
+	MaterialRecord* last = nullptr;
+	
+	string direction_sort;
+	int direction = 1;
+	string print_direction_sort[14]= {"       Direction Sort:","Upstair","Downstair","Back to Main Menu"};
+	int int_print_direction_sort = 4;
+	do{
+	for(int j=0; j<int_print_direction_sort; j++) {
+		if(j==direction) {
+			SetConsoleTextAttribute(hConsole, 10);
+			cout<<" -> "<<print_direction_sort[j]<<endl;
+		} else
+			cout<<"    "<<print_direction_sort[j]<<endl;
+			SetConsoleTextAttribute(hConsole, 15);
+		}
+		c=getch();
+		if(c==115 || c==80) direction++;
+		if(c==119 || c==72) direction--;
+		if(direction<1) direction=1;
+		if(direction>int_print_direction_sort-1) direction=int_print_direction_sort-1;
+		system("cls");
+	} while(c!= 13);
+	
+	switch (direction) {
+		case 1: {
+			do {
+				swapped = false;
+				current = head;
+		
+				while (current->next != last) {
+					if (compareByColumnUp(*current, *(current->next), column)) {
+						swap(current, current->next);
+						swapped = true;
+					}
+					current = current->next;
+				}
+				last = current;
+			} while (swapped);
+			
+			break;
+		}
+		case 2: {
+			do {
+				swapped = false;
+				current = head;
+
+				while (current->next != last) {
+					if (compareByColumnDown(*current, *(current->next), column)) {
+					swap(current, current->next);
+					swapped = true;
+					}
+					current = current->next;
+				}
+				last = current;
+			} while (swapped);
+			break;
+		}
+		case 3: {
+			return;
+		}
+	}
+	
 	system("cls");
-	cout << "Records sorted by column " << column_print << " within the list successfully!" << endl;
-	cout << "-->Press any key to go back<--";
-	getch();
-	system("cls");
+	int choose = 1;
+	string print_choose[14]= {"            Records sorted","Back to Main Menu","View Records"};
+	int int_choose = 3;
+	do{
+	for(int j=0; j<int_choose; j++) {
+		if(j==choose) {
+			SetConsoleTextAttribute(hConsole, 10);
+			cout<<" -> "<<print_choose[j]<<endl;
+		} else
+			cout<<"    "<<print_choose[j]<<endl;
+			SetConsoleTextAttribute(hConsole, 15);
+		}
+		c=getch();
+		if(c==115 || c==80) choose++;
+		if(c==119 || c==72) choose--;
+		if(choose<1) choose=1;
+		if(choose>int_choose-1) choose=int_choose-1;
+		system("cls");
+	} while(c!= 13);
+	
+	switch (choose) {
+		case 1: {
+			break;
+		}
+		case 2: {
+			displayRecords(head);
+			system("cls");
+			break;
+		}
+	}
 }
 
 //##############################################clear memory###################################//
@@ -739,6 +862,7 @@ int main() {
     SetConsoleScreenBufferSize(hOut, NewSBSize);
 
 	// defoltnoe(стартовое) заполнение таблицы
+	for(int i=0; i<2; i++){
 	addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
@@ -785,6 +909,7 @@ int main() {
 	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 	system("cls");
+}
 
 	int c,i=1;
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -841,13 +966,20 @@ int main() {
 				cin >> disposed;
 				
 				addRecord(records, createRecord(id, factory, branch, lastName, start, received, disposed));
+				cout << "-->Press any key to go back<--";
+				getch();
+				system("cls");
 				break;
 			}
 			case 3: {
 				int idToDelete;
 				cout << "Enter ID of the record to delete: ";
 				cin >> idToDelete;
+				system("cls");
 				deleteRecord(records, idToDelete);
+				cout << "-->Press any key to go back<--";
+				getch();
+				system("cls");
 				break;
 			}
 			case 4: {
@@ -874,11 +1006,7 @@ int main() {
 				break;
 			}
 			case 9: {
-				int columnSort;
-				cout << "(1)ID (2)Factory (3)Branch (4)Last Name (5)Start Value (6)Received Value (7)Disposed Value \n";
-				cout << "Enter number column for sort: ";
-				cin >> columnSort;
-				sortRecords(records, columnSort);
+				sortRecords(records);
 				break;
 			}
 			case 10: {
