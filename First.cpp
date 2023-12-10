@@ -481,7 +481,7 @@ void sortRecords(MaterialRecord*& head) {
 	string column_sort;
 	int c;
 	int column = 1;
-	string print_sort[14]= {"            Sort:","ID","Factory","Branch","Last Name","Start Value","Received Value","Disposed Value","Back to Main Menu"};
+	string print_sort[9]= {"            Sort:","ID","Factory","Branch","Last Name","Start Value","Received Value","Disposed Value","Back to Main Menu"};
 	int int_print_sort = 9;
 	do{
 	for(int j=0; j<int_print_sort; j++) {
@@ -600,7 +600,7 @@ void sortRecords(MaterialRecord*& head) {
 	
 	system("cls");
 	int choose = 1;
-	string print_choose[14]= {"            Records sorted","Back to Main Menu","View Records"};
+	string print_choose[3]= {"            Records sorted","Back to Main Menu","View Records"};
 	int int_choose = 3;
 	do{
 	for(int j=0; j<int_choose; j++) {
@@ -642,22 +642,78 @@ void releaseMemory(MaterialRecord*& head) {
 }
 
 void exitProgram(MaterialRecord*& head) {
-	cout << "Maybe save Records?(Y=1/N=any symbol + Enter): ";
-	int saveChoice;
-	cin >> saveChoice;
-	if (saveChoice == 1) {
-		cout << "Format?(Bin=1/txt=any key + Enter): ";
-		int formatChoice;
-		cin >> formatChoice;
-		if (formatChoice == 1) {
-			saveToBinaryFile(head, "material_records.bin");
-		} else {
-			saveToTextFile(head, "material_records.txt");
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	system("cls");
+	int c;
+	int choose = 1;
+	string print_choose[4]= {"            Maybe save Records?", "Yes", "No", "Back to Main Menu"};
+	int int_choose = 4;
+	do{
+	for(int j=0; j<int_choose; j++) {
+		if(j==choose) {
+			SetConsoleTextAttribute(hConsole, 10);
+			cout<<" -> "<<print_choose[j]<<endl;
+		} else
+			cout<<"    "<<print_choose[j]<<endl;
+			SetConsoleTextAttribute(hConsole, 15);
+		}
+		c=getch();
+		if(c==115 || c==80) choose++;
+		if(c==119 || c==72) choose--;
+		if(choose<1) choose=1;
+		if(choose>int_choose-1) choose=int_choose-1;
+		system("cls");
+	} while(c!= 13);
+	
+	switch (choose) {
+		case 1: {
+			system("cls");
+			int saving_choose = 1;
+			string print_saving_choose[4]= {"         Choose saving format:", "*.txt", "*.bin", "Back to Main Menu"};
+			int int_saving_choose = 4;
+			do{
+				for(int j=0; j<int_saving_choose; j++) {
+					if(j==saving_choose) {
+						SetConsoleTextAttribute(hConsole, 10);
+						cout<<" -> "<<print_saving_choose[j]<<endl;
+					} else
+						cout<<"    "<<print_saving_choose[j]<<endl;
+						SetConsoleTextAttribute(hConsole, 15);
+					}
+				c=getch();
+				if(c==115 || c==80) saving_choose++;
+				if(c==119 || c==72) saving_choose--;
+				if(saving_choose<1) saving_choose=1;
+				if(saving_choose>int_saving_choose-1) saving_choose=int_saving_choose-1;
+				system("cls");
+			}while(c!= 13);
+			switch (saving_choose) {
+				case 1: {
+					saveToTextFile(head, "material_records.txt");
+					releaseMemory(head);
+					cout << "Exiting the program. Memory has been freed." << endl;
+					exit(0);
+				}
+				case 2: {
+					saveToBinaryFile(head, "material_records.bin");
+					releaseMemory(head);
+					cout << "Exiting the program. Memory has been freed." << endl;
+					exit(0);
+				}
+				case 3: {
+					return;
+				}
+			}
+		}
+		case 2: {
+			releaseMemory(head);
+			cout << "Exiting the program. Memory has been freed." << endl;
+			exit(0);
+		}
+		case 3: {
+			return;
 		}
 	}
-	releaseMemory(head);
-	cout << "Exiting the program. Memory has been freed." << endl;
-	exit(0);
 }
 
 //##############################################poisk###################################//
@@ -853,60 +909,60 @@ void calculateTotals(MaterialRecord* head) {
 
 int main() {
 	MaterialRecord* records = nullptr; // голова списка записей
-
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    COORD NewSBSize;
-    NewSBSize.X = 50; // Ширина
-    NewSBSize.Y = 100; // Высота
-
-    SetConsoleScreenBufferSize(hOut, NewSBSize);
+//
+//	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+//    COORD NewSBSize;
+//    NewSBSize.X = 50; // Ширина
+//    NewSBSize.Y = 100; // Высота
+//
+//    SetConsoleScreenBufferSize(hOut, NewSBSize);
 
 	// defoltnoe(стартовое) заполнение таблицы
 	for(int i=0; i<2; i++){
 	addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
-	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
+	addRecord(records, createRecord(2, 1, 101, "Smith", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(111111, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(222222, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 		addRecord(records, createRecord(1, 1, 101, "Smith", 5000.0, 1000.0, 500.0));
 	addRecord(records, createRecord(2, 1, 101, "Johnson", 7000.0, 1500.0, 800.0));
 	addRecord(records, createRecord(3, 2, 201, "Williams", 6000.0, 1200.0, 700.0));
-	addRecord(records, createRecord(4, 2, 101, "Anderson", 400.0, 1500.0, 100.0));
+	addRecord(records, createRecord(4, 2, 101, "Smith", 400.0, 1500.0, 100.0));
 	addRecord(records, createRecord(5, 1, 102, "Besson", 70000.0, 1100.0, 0.0));
 	system("cls");
 }
@@ -1007,6 +1063,7 @@ int main() {
 			}
 			case 9: {
 				sortRecords(records);
+
 				break;
 			}
 			case 10: {
