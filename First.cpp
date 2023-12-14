@@ -303,6 +303,7 @@ void editRecord(MaterialRecord*& head, int idToEdit){
 		}
     }
 	system("cls");
+
     
 	cout << "Record ID " << idToEdit << " updated successfully." << endl;
     cout << "-->Press any key to go back<--";
@@ -808,8 +809,13 @@ void exitProgram(MaterialRecord*& head) {
 			}while(c!= 13);
 			switch (saving_choose) {
 				case 1: {
-					saveToTextFile(head, "material_records.txt");
+					string filename;
+    				cout << "Enter the name of the file to save: ";
+    				cin >> filename;
+    				filename = filename + ".txt";
+					saveToTextFile(head, filename);
 					releaseMemory(head);
+					system("cls");
 					cout << "Exiting the program. Memory has been freed." << endl;
 					exit(0);
 				}
@@ -1088,11 +1094,11 @@ int main() {
 
 	int c,i=1;
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	string print_main[14]= {"            Menu:","View Records","Add Record","Delete Record","Edit Record",
-	                        "Save Records to file.txt","Save Records to file.bin","Load Records from file.txt","Load Records from file.bin",
+	string print_main[13]= {"            Menu:","View Records","Add Record","Delete Record","Edit Record",
+	                        "Save Records to file.txt","Save Records to file.bin","Load Records from file",
 	                        "Sort Records","Search by LastName","Clear Records","Generate Report","Exit"
 	                       };
-	int int_print_main = 14;
+	int int_print_main = 13;
 	while(true) {
 		do {
 			for(int j=0; j<int_print_main; j++) {
@@ -1166,34 +1172,40 @@ int main() {
 				break;
 			}
 			case 5: {
-				saveToTextFile(records, "material_records.txt");
+				string filename;
+    			cout << "Enter the name of the file to save: ";
+    			cin >> filename;
+    			filename = filename + ".txt";
+    			system("cls");    			
+				saveToTextFile(records, filename);
 				break;
 			}
 			case 6: {
-				saveToBinaryFile(records, "material_records.bin");
+    			system("cls");    			
+				saveToBinaryFile(records, "Material_Records.bin");
 				break;
 			}
 			case 7: {
-				loadFromTextFile(records, "material_records.txt");
+				string filename;
+    			cout << "Enter the name of the file to save: ";
+    			cin >> filename;
+    			filename = filename + ".txt";
+    			system("cls");    			
+				loadFromTextFile(records, filename);
 				break;
 			}
 			case 8: {
-				loadFromBinaryFile(records, "material_records.bin");
+				sortRecords(records);
 				break;
 			}
 			case 9: {
-				sortRecords(records);
-
-				break;
-			}
-			case 10: {
 				string searchLastName;
 				cout << "Enter Last Name to search: ";
 				cin >> searchLastName;
 				searchByLastName(records, searchLastName);
 				break;
 			}
-			case 11: {
+			case 10: {
 				releaseMemory(records);
 				cout << "Records has been cleared." <<endl;
 				cout << "-->Press any key to go back<--";
@@ -1201,11 +1213,11 @@ int main() {
     			system("cls");
 				break;
 			}
-			case 12: {
+			case 11: {
 				generateReport(records);
 				break;
 			}
-			case 13: {
+			case 12: {
 				exitProgram(records);
 			}
 		}
