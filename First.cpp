@@ -39,7 +39,7 @@ MaterialRecord* createRecord( int id, int factoryNumber, int branchNumber, const
 void saveToTextFile(MaterialRecord* head, const string& filename);
 void saveToBinaryFile(MaterialRecord* head, const string& filename);
 void loadFromTextFile(MaterialRecord*& head, const string& filename);
-void loadFromBinaryFile(MaterialRecord*& head, const char* filename);
+//void loadFromBinaryFile(MaterialRecord*& head, const char* filename);
 
 void calculateEndPeriodValueByBranch(MaterialRecord* head);
 void calculateEndPeriodValueByFactory(MaterialRecord* head);
@@ -48,6 +48,8 @@ void calculateTotals(MaterialRecord* head);
 void displayRecords(MaterialRecord* head);
 
 void sortRecords(MaterialRecord*& head);
+
+void releaseMemory(MaterialRecord*& head);
 //##############################################Record handing###################################//
 
 void idCheck(MaterialRecord*& head, int& id) {
@@ -75,6 +77,7 @@ void addRecord(MaterialRecord*& head, MaterialRecord* newRecord) {
 		}
 		temp->next = newRecord;
 	}
+	system("cls");
 	cout << "Record added successfully!" << endl;
 	
 }
@@ -376,7 +379,43 @@ void loadFromTextFile(MaterialRecord*& head, const string& filename) {
 		cout << "Unable to open file!" << endl;
 		return;
 	}
+	if (head != nullptr) {
+        int c,i=1;
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		string print_download[4]= {"Do you want to clear existing records?", "Yes", "No", "Back To Main Menu"
+	                       };
+		int int_print_download = 4;
 
+			do {
+				for(int j=0; j<int_print_download; j++) {
+					if(j==i) {
+						SetConsoleTextAttribute(hConsole, 10);
+						cout<<" -> "<<print_download[j]<<endl;
+					} else
+						cout<<"    "<<print_download[j]<<endl;
+					SetConsoleTextAttribute(hConsole, 15);
+				}
+				c=getch();
+				if(c==115 || c==80) i++;
+				if(c==119 || c==72) i--;
+				if(i<1) i=1;
+				if(i>int_print_download-1) i=int_print_download-1;
+				system("cls");
+			} while(c!= 13);
+	    switch (i) {
+	        case 1: {
+	            releaseMemory(head);
+	            cout << "Existing records cleared." << endl;
+	            break;
+	        }
+	        case 2: {
+	            cout << "Existing records kept." << endl;
+	    		break;
+	        }
+	        case 3: {
+				return;
+			}
+	    }
 	int id, factory, branch;
 	string lastName;
 	double start, received, disposed;
@@ -408,76 +447,81 @@ void loadFromTextFile(MaterialRecord*& head, const string& filename) {
     cout << "-->Press any key to go back<--";
 	getch();
 	system("cls");
+	}
 }
 
-void loadFromBinaryFile(MaterialRecord*& head, const char* filename) {
-    FILE* file = fopen(filename, "rb"); // Открытие файла для чтения в бинарном режиме (rb - read binary)
-
-    if (file == nullptr) {
-        cerr << "Unable to open file for reading!" << endl;
-        return;
-    }
-
-    while (!feof(file)) {
-        MaterialRecord* newRecord = new MaterialRecord;
-        size_t bytesRead = fread(newRecord, sizeof(MaterialRecord), 1, file); // Чтение одной записи из файла
-
-        if (bytesRead != 1) {
-            delete newRecord;
-            break;
-        }
-
-        newRecord->next = nullptr;
-
-        if (head == nullptr) {
-            head = newRecord;
-        } else {
-            MaterialRecord* temp = head;
-            while (temp->next != nullptr) {
-                temp = temp->next;
-            }
-            temp->next = newRecord;
-        }
-    }
-
-    fclose(file); // Закрытие файла
-    cout << "Data loaded from binary file successfully!" << endl;
-    cout << "-->Press any key to go back<--";
-	getch();
-	system("cls");
-}
-
-//void loadFromBinaryFile(MaterialRecord*& head, const string& filename) {
-//	ifstream file(filename, ios::binary);
-//	if (!file.is_open()) {
-//		cout << "Unable to open file!" << endl;
-//		return;
-//	}
+//void loadFromBinaryFile(MaterialRecord*& head, const char* filename) {
+//    FILE* file = fopen(filename, "rb"); // Открытие файла для чтения в бинарном режиме (rb - read binary)
 //
-//	while (!file.eof()) {
-//		MaterialRecord* newRecord = new MaterialRecord;
-//		file.read(reinterpret_cast<char*>(newRecord), sizeof(MaterialRecord));
+//    if (file == nullptr) {
+//        cerr << "Unable to open file for reading!" << endl;
+//        return;
+//    }
+//	if (head != nullptr) {
+//    int c,i=1;
+//	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//	string print_download[4]= {"Do you want to clear existing records?", "Yes", "No", "Back To Main Menu"
+//                       };
+//	int int_print_download = 4;
 //
-//		if (file.gcount() != sizeof(MaterialRecord)) {
-//			delete newRecord;
-//			break;
-//		}
-//
-//		newRecord->next = nullptr;
-//
-//		if (head == nullptr) {
-//			head = newRecord;
-//		} else {
-//			MaterialRecord* temp = head;
-//			while (temp->next != nullptr) {
-//				temp = temp->next;
+//		do {
+//			for(int j=0; j<int_print_download; j++) {
+//				if(j==i) {
+//					SetConsoleTextAttribute(hConsole, 10);
+//					cout<<" -> "<<print_download[j]<<endl;
+//				} else
+//					cout<<"    "<<print_download[j]<<endl;
+//				SetConsoleTextAttribute(hConsole, 15);
 //			}
-//			temp->next = newRecord;
+//			c=getch();
+//			if(c==115 || c==80) i++;
+//			if(c==119 || c==72) i--;
+//			if(i<1) i=1;
+//			if(i>int_print_download-1) i=int_print_download-1;
+//			system("cls");
+//		} while(c!= 13);
+//    switch (i) {
+//        case 1: {
+//            releaseMemory(head);
+//            cout << "Existing records cleared." << endl;
+//            break;
+//        }
+//        case 2: {
+//            cout << "Existing records kept." << endl;
+//    		break;
+//        }
+//        case 3: {
+//			return;
 //		}
-//	}
+//    }
+//}
+//    while (!feof(file)) {
+//        MaterialRecord* newRecord = new MaterialRecord;
+//        size_t bytesRead = fread(newRecord, sizeof(MaterialRecord), 1, file); // Чтение одной записи из файла
 //
-//	file.close();
-//	cout << "Data loaded from binary file successfully!" << endl;
+//        if (bytesRead != 1) {
+//            delete newRecord;
+//            break;
+//        }
+//
+//        newRecord->next = nullptr;
+//
+//        if (head == nullptr) {
+//            head = newRecord;
+//        } else {
+//            MaterialRecord* temp = head;
+//            while (temp->next != nullptr) {
+//                temp = temp->next;
+//            }
+//            temp->next = newRecord;
+//        }
+//    }
+//
+//    fclose(file); // Закрытие файла
+//    cout << "Data loaded from binary file successfully!" << endl;
+//    cout << "-->Press any key to go back<--";
+//	getch();
+//	system("cls");
 //}
 
 //##############################################sortirovka###################################//
