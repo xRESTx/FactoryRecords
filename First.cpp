@@ -76,7 +76,7 @@ void addRecord(MaterialRecord*& head, MaterialRecord* newRecord) {
 		temp->next = newRecord;
 	}
 	cout << "Record added successfully!" << endl;
-
+	
 }
 
 //int countRecords(MaterialRecord* head) {
@@ -195,43 +195,118 @@ void deleteRecord(MaterialRecord*& head, int idToDelete) {
 	
 }
 
-void editRecord(MaterialRecord* head, int idToEdit) {
+void editRecord(MaterialRecord*& head, int idToEdit){
 	MaterialRecord* current = head;
-	while (current != nullptr) {
-		if (current->id == idToEdit) {
-			cout << "Editing Record with ID: " << idToEdit << endl;
-			cout << "Enter new Factory Number: ";
-			cin >> current->factoryNumber;
+    bool found = false;
 
-			cout << "Enter new Branch Number: ";
-			cin >> current->branchNumber;
+    while (current != nullptr) {
+        if (current->id == idToEdit) {
+            found = true;
+            break;
+        }
+        current = current->next;
+    }
 
-			cout << "Enter new Last Name: ";
-			cin >> current->LastName;
-
-			cout << "Enter new Start Value: ";
-			cin >> current->startValue;
-
-			cout << "Enter new Received Value: ";
-			cin >> current->receivedValue;
-
-			cout << "Enter new Disposed Value: ";
-			cin >> current->disposedValue;
-
-			cout << "Record updated successfully!" << endl;
-			cout << "-->Press any key to go back<--";
-			getch();
+    if (!found) {
+        cout << "Record with ID " << idToEdit << " not found!" << endl;
+		cout << "Please enter a new ID: ";
+		cin >> idToEdit;
+		system("cls");
+		editRecord(head, idToEdit);
+        return;
+    }
+    
+    int c,choice_edit=0;
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	string print_edit[8]= {"Edit Factory Number","Edit Branch Number","Edit Last Name","Edit Start Value","Edit Received Value",
+	                        "Edit Disposed Value","Edit All Attributes", "Back To Main Menu"
+	                       };
+	int int_print_edit = 8;
+	while(true) {
+		do {
+			cout << "					Edit Record  " << idToEdit << endl;
+			cout << "----------------------------------------------------------------------------------------------" << endl;
+			cout << "|   ID   | Factory | Branch |   Last Name   | Start Value  | Received Value | Disposed Value |" << endl;
+			cout << "----------------------------------------------------------------------------------------------" << endl;
+			printf("| %6d | %7d | %6d | %13s | %12.2f | %14.2f | %14.2f |\n", current->id, current->factoryNumber,
+       		current->branchNumber, current->LastName.c_str(), current->startValue, current->receivedValue, current->disposedValue);
+       		cout << "----------------------------------------------------------------------------------------------" << endl;
+			for(int j=0; j<int_print_edit; j++) {
+				if(j==choice_edit) {
+					SetConsoleTextAttribute(hConsole, 10);
+					cout<<" -> "<<print_edit[j]<<endl;
+				} else
+					cout<<"    "<<print_edit[j]<<endl;
+				SetConsoleTextAttribute(hConsole, 15);
+			}
+			c=getch();
+			if(c==115 || c==80) choice_edit++;
+			if(c==119 || c==72) choice_edit--;
+			if(choice_edit<0) choice_edit=0;
+			if(choice_edit>int_print_edit-1) choice_edit=int_print_edit-1;
 			system("cls");
+		} while(c!= 13);
+
+    switch (choice_edit) {
+        case 0: {
+            cout << "Enter new Factory Number: ";
+            cin >> current->factoryNumber;
+            break;
+        }
+        case 1: {
+            cout << "Enter new Branch Number: ";
+            cin >> current->branchNumber;
+            break;
+        }
+        case 2: {
+            cout << "Enter new Last Name: ";
+            cin.ignore();
+            getline(cin, current->LastName);
+            break;
+        }
+        case 3: {
+            cout << "Enter new Start Value: ";
+            cin >> current->startValue;
+            break;
+        }
+        case 4: {
+            cout << "Enter new Received Value: ";
+            cin >> current->receivedValue;
+            break;
+        }
+        case 5: {
+            cout << "Enter new Disposed Value: ";
+            cin >> current->disposedValue;
+            break;
+		}
+        case 6: {
+            cout << "Enter new Factory Number: ";
+            cin >> current->factoryNumber;
+            cout << "Enter new Branch Number: ";
+            cin >> current->branchNumber;
+            cout << "Enter new Last Name: ";
+            cin.ignore();
+            getline(cin, current->LastName);
+            cout << "Enter new Start Value: ";
+            cin >> current->startValue;
+            cout << "Enter new Received Value: ";
+            cin >> current->receivedValue;
+            cout << "Enter new Disposed Value: ";
+            cin >> current->disposedValue;
+            break;
+        }
+        case 7: {
 			return;
 		}
-		current = current->next;
-	}
-
-	cout << "Record with ID " << idToEdit << " not found!" << endl;
-	cout << "Please enter a new ID: ";
-	cin >> idToEdit;
+    }
 	system("cls");
-	editRecord(head, idToEdit);
+    
+	cout << "Record ID " << idToEdit << " updated successfully." << endl;
+    cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
+    
+}
 }
 
 //##############################################rabota s failami###################################//
@@ -1042,6 +1117,7 @@ int main() {
 				int idToEdit;
 				cout << "Enter ID of the record to edit: ";
 				cin >> idToEdit;
+				system("cls");
 				editRecord(records, idToEdit);
 				break;
 			}
