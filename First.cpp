@@ -39,7 +39,6 @@ MaterialRecord* createRecord( int id, int factoryNumber, int branchNumber, const
 void saveToTextFile(MaterialRecord* head, const string& filename);
 void saveToBinaryFile(MaterialRecord* head, const string& filename);
 void loadFromTextFile(MaterialRecord*& head, const string& filename);
-//void loadFromBinaryFile(MaterialRecord*& head, const char* filename);
 
 void calculateEndPeriodValueByBranch(MaterialRecord* head);
 void calculateEndPeriodValueByFactory(MaterialRecord* head);
@@ -152,23 +151,12 @@ void displayRecords(MaterialRecord* head) {
     }while (c!=13);
 }
 
-
-//void displayRecords(MaterialRecord* head) {
-//	cout << "----------------------------------------------------------------------------------------------" << endl;
-//	cout << "|   ID   | Factory | Branch |   Last Name   | Start Value  | Received Value | Disposed Value |" << endl;
-//	cout << "----------------------------------------------------------------------------------------------" << endl;
-//	MaterialRecord* current = head;
-//	while (current != nullptr) {
-////		cout << "| " << setw(6) << current->id << " | " << setw(7) << current->factoryNumber << " | " << setw(6) << current->branchNumber << " | " << setw(13) << current->LastName << " | " << setw(14) << current->startValue << " | " << setw(16) << current->receivedValue << " | " << setw(16) << current->disposedValue << " |"<< endl;
-//		printf("| %6d | %7d | %6d | %13s | %12.2f | %14.2f | %14.2f |\n", current->id, current->factoryNumber,
-//		       current->branchNumber, current->LastName.c_str(), current->startValue, current->receivedValue,
-//		       current->disposedValue);
-//		current = current->next;
-//	}
-//	cout << "----------------------------------------------------------------------------------------------" << endl;
-//}
-
 void deleteRecord(MaterialRecord*& head, int idToDelete) {
+	if (idToDelete == 0){
+		system("cls");
+		return;
+	}
+	
 	if (head == nullptr) {
 		cout << "List is empty!" << endl;
 		return;
@@ -201,7 +189,10 @@ void deleteRecord(MaterialRecord*& head, int idToDelete) {
 void editRecord(MaterialRecord*& head, int idToEdit){
 	MaterialRecord* current = head;
     bool found = false;
-
+	if (idToEdit == 0){
+		system("cls");
+		return;
+	}
     while (current != nullptr) {
         if (current->id == idToEdit) {
             found = true;
@@ -357,22 +348,6 @@ void saveToBinaryFile(MaterialRecord* head, const char* filename) {
 	getch();
 	system("cls");
 }
-//void saveToBinaryFile(MaterialRecord* head, const string& filename) {
-//	ofstream file(filename, ios::binary);
-//	if (!file.is_open()) {
-//		cout << "Unable to open file!" << endl;
-//		return;
-//	}
-//
-//	MaterialRecord* current = head;
-//	while (current != nullptr) {
-//		file.write(reinterpret_cast<char*>(current), sizeof(MaterialRecord));
-//		current = current->next;
-//	}
-//
-//	file.close();
-//	cout << "Data saved to binary file successfully!" << endl;
-//}
 
 void loadFromTextFile(MaterialRecord*& head, const string& filename) {
 	ifstream file(filename);
@@ -450,80 +425,6 @@ void loadFromTextFile(MaterialRecord*& head, const string& filename) {
 	system("cls");
 	}
 }
-
-//void loadFromBinaryFile(MaterialRecord*& head, const char* filename) {
-//    FILE* file = fopen(filename, "rb"); // Открытие файла для чтения в бинарном режиме (rb - read binary)
-//
-//    if (file == nullptr) {
-//        cerr << "Unable to open file for reading!" << endl;
-//        return;
-//    }
-//	if (head != nullptr) {
-//    int c,i=1;
-//	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-//	string print_download[4]= {"Do you want to clear existing records?", "Yes", "No", "Back To Main Menu"
-//                       };
-//	int int_print_download = 4;
-//
-//		do {
-//			for(int j=0; j<int_print_download; j++) {
-//				if(j==i) {
-//					SetConsoleTextAttribute(hConsole, 10);
-//					cout<<" -> "<<print_download[j]<<endl;
-//				} else
-//					cout<<"    "<<print_download[j]<<endl;
-//				SetConsoleTextAttribute(hConsole, 15);
-//			}
-//			c=getch();
-//			if(c==115 || c==80) i++;
-//			if(c==119 || c==72) i--;
-//			if(i<1) i=1;
-//			if(i>int_print_download-1) i=int_print_download-1;
-//			system("cls");
-//		} while(c!= 13);
-//    switch (i) {
-//        case 1: {
-//            releaseMemory(head);
-//            cout << "Existing records cleared." << endl;
-//            break;
-//        }
-//        case 2: {
-//            cout << "Existing records kept." << endl;
-//    		break;
-//        }
-//        case 3: {
-//			return;
-//		}
-//    }
-//}
-//    while (!feof(file)) {
-//        MaterialRecord* newRecord = new MaterialRecord;
-//        size_t bytesRead = fread(newRecord, sizeof(MaterialRecord), 1, file); // Чтение одной записи из файла
-//
-//        if (bytesRead != 1) {
-//            delete newRecord;
-//            break;
-//        }
-//
-//        newRecord->next = nullptr;
-//
-//        if (head == nullptr) {
-//            head = newRecord;
-//        } else {
-//            MaterialRecord* temp = head;
-//            while (temp->next != nullptr) {
-//                temp = temp->next;
-//            }
-//            temp->next = newRecord;
-//        }
-//    }
-//
-//    fclose(file); // Закрытие файла
-//    cout << "Data loaded from binary file successfully!" << endl;
-//    cout << "-->Press any key to go back<--";
-//	getch();
-//	system("cls");
-//}
 
 //##############################################sortirovka###################################//
 
@@ -660,7 +561,7 @@ void sortRecords(MaterialRecord*& head) {
 	
 	string direction_sort;
 	int direction = 1;
-	string print_direction_sort[14]= {"       Direction Sort:","Upstair","Downstair","Back to Main Menu"};
+	string print_direction_sort[14]= {"       Direction Sort:","Ascending","Descending","Back to Main Menu"};
 	int int_print_direction_sort = 4;
 	do{
 	for(int j=0; j<int_print_direction_sort; j++) {
@@ -846,6 +747,10 @@ void exitProgram(MaterialRecord*& head) {
 void searchByLastName(MaterialRecord* head, const string& lastName) {
 	MaterialRecord* current = head;
 	bool found = false;
+	if (lastName == "0"){
+		system("cls");
+		return;
+	}
 
 	while (current != nullptr) {
 		if (current->LastName == lastName) {
@@ -875,11 +780,6 @@ void searchByLastName(MaterialRecord* head, const string& lastName) {
 }
 
 //##############################################report###################################//
-//void generateReport(MaterialRecord* head) {
-//    calculateEndPeriodValueByBranch(head);
-//    calculateEndPeriodValueByFactory(head);
-//    calculateTotals(head);
-//}
 
 void generateReport(MaterialRecord* head) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -1032,15 +932,9 @@ void calculateTotals(MaterialRecord* head) {
     return;
 }
 
+
 int main() {
-	MaterialRecord* records = nullptr; // голова списка записей
-//
-//	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-//    COORD NewSBSize;
-//    NewSBSize.X = 50; // Ширина
-//    NewSBSize.Y = 100; // Высота
-//
-//    SetConsoleScreenBufferSize(hOut, NewSBSize);
+	MaterialRecord* records = nullptr;
 
 	// defoltnoe(стартовое) заполнение таблицы
 	for(int i=0; i<2; i++){
@@ -1130,8 +1024,12 @@ int main() {
 				string lastName;
 				double start, received, disposed;
 				
-				cout << "Enter ID: ";
+				cout << "Enter '0' to go to the main menu"<<endl<<"Enter ID: ";
 				cin >> id;
+				if (id == 0){
+					system("cls");
+					break;
+				}
 				idCheck(records, id);
 				cout << "Enter Factory Number: ";
 				cin >> factory;
@@ -1154,7 +1052,7 @@ int main() {
 			}
 			case 3: {
 				int idToDelete;
-				cout << "Enter ID of the record to delete: ";
+				cout << "Enter '0' to go to the main menu"<<endl<<"Enter ID of the record to delete: ";
 				cin >> idToDelete;
 				system("cls");
 				deleteRecord(records, idToDelete);
@@ -1165,7 +1063,7 @@ int main() {
 			}
 			case 4: {
 				int idToEdit;
-				cout << "Enter ID of the record to edit: ";
+				cout << "Enter '0' to go to the main menu"<<endl<<"Enter ID of the record to edit: ";
 				cin >> idToEdit;
 				system("cls");
 				editRecord(records, idToEdit);
@@ -1176,7 +1074,7 @@ int main() {
     			cout << "Enter the name of the file to save: ";
     			cin >> filename;
     			filename = filename + ".txt";
-    			system("cls");    			
+    			system("cls");
 				saveToTextFile(records, filename);
 				break;
 			}
@@ -1200,7 +1098,7 @@ int main() {
 			}
 			case 9: {
 				string searchLastName;
-				cout << "Enter Last Name to search: ";
+				cout << "Enter '0' to go to the main menu"<<endl<< "Enter Last Name to search: ";
 				cin >> searchLastName;
 				searchByLastName(records, searchLastName);
 				break;
