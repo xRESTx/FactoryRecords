@@ -25,7 +25,7 @@ struct MaterialRecord {
 	double startValue;
 	double receivedValue;
 	double disposedValue;
-	MaterialRecord* next; // указатель на следующую запись
+	MaterialRecord* next; 
 };
 
 MaterialRecord* createRecord(int factoryNumber, int branchNumber, const string& lastName, double startValue, double receivedValue, double disposedValue) {
@@ -88,9 +88,9 @@ void displayRecords(MaterialRecord* head) {
 	do {
 		system("cls");
 		printf("Current Page: %d\n", currentPage);
-		cout << "----------------------------------------------------------------------------------------------" << endl;
+		cout << "----------------------------------------------------------------------------------------------------" << endl;
 		cout << "|  #  |   ID   | Factory | Branch |   Last Name   | Start Value  | Received Value | Disposed Value |" << endl;
-		cout << "----------------------------------------------------------------------------------------------" << endl;
+		cout << "----------------------------------------------------------------------------------------------------" << endl;
 
 		int count = 0;
 		int lineNumber = 1 ; // Начальный номер строки
@@ -756,9 +756,9 @@ void searchByLastName(MaterialRecord* head, const string& lastName) {
 			if (!found) {
 				found = true;
 				cout << "Search results for '" << lastName << "':" << endl;
-				cout << "--------------------------------------------------------------------------------------------------------------" << endl;
-				cout << "|   ID   | Factory | Branch |   Last Name   | Start Value | Received Value | Disposed Value |" << endl;
-				cout << "--------------------------------------------------------------------------------------------------------------" << endl;
+				cout << "---------------------------------------------------------------------------------------------" << endl;
+				cout << "|   ID   | Factory | Branch |   Last Name   | Start Value  | Received Value | Disposed Value |" << endl;
+				cout << "---------------------------------------------------------------------------------------------" << endl;
 			}
 			printf("| %6d | %7d | %6d | %13s | %12.2f | %14.2f | %14.2f |\n", current->id, current->factoryNumber,
 			       current->branchNumber, current->LastName.c_str(), current->startValue,
@@ -770,7 +770,7 @@ void searchByLastName(MaterialRecord* head, const string& lastName) {
 	if (!found) {
 		cout << "No records found for '" << lastName << "'." << endl;
 	} else {
-		cout << "--------------------------------------------------------------------------------------------------------------" << endl;
+		cout << "----------------------------------------------------------------------------------------------" << endl;
 	}
 	cout << "-->Press any key to go back<--";
 	getch();
