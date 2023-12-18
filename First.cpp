@@ -32,7 +32,7 @@ MaterialRecord* createRecord(int factoryNumber, int branchNumber, const string& 
 	static int currentId = 1; // Статическая переменная для отслеживания текущего значения id
 	MaterialRecord* newRecord = new MaterialRecord;
 
-	newRecord->id = currentId++; // Присваиваем текущее значение id и увеличиваем его на 1
+	newRecord->id = currentId++;
 	newRecord->factoryNumber = factoryNumber;
 	newRecord->branchNumber = branchNumber;
 	newRecord->LastName = lastName;
@@ -77,25 +77,12 @@ void addRecord(MaterialRecord*& head, MaterialRecord* newRecord) {
 	}
 	system("cls");
 	cout << "Record added successfully!" << endl;
-
 }
-
-//int countRecords(MaterialRecord* head) {
-//    int count = 0;
-//    MaterialRecord* current = head;
-//
-//    while (current != nullptr) {
-//        count++;
-//        current = current->next;
-//    }
-//
-//    return count;
-//}
 
 void displayRecords(MaterialRecord* head) {
 	int currentPage = 1;
 	int itemsPerPage = 20;
-	char c = 0;
+	char key = 0;
 	MaterialRecord* current = head;
 
 	do {
@@ -116,9 +103,9 @@ void displayRecords(MaterialRecord* head) {
 		}
 
 		printf("\nPress 'w' for previous page, 's' for next page, 'Enter' to exit: ");
-		c = getch();
+		key = getch();
 
-		if (c == 115 || c == 80) {
+		if (key == KEY_S || key == KEY_DOWN) {
 			currentPage++;
 			if (current == nullptr) {
 				currentPage--;
@@ -128,7 +115,7 @@ void displayRecords(MaterialRecord* head) {
 				temp = temp->next;
 			}
 			current = temp;
-		} else if (c == 119 || c == 72) {
+		} else if (key == KEY_W || key == KEY_UP) {
 			currentPage--;
 			if (currentPage < 1) {
 				currentPage = 1;
@@ -146,7 +133,7 @@ void displayRecords(MaterialRecord* head) {
 			}
 			current = temp;
 		}
-	} while (c != 13);
+	} while (key != KEY_ENTER);
 }
 
 void deleteRecord(MaterialRecord*& head, int idToDelete) {
@@ -157,6 +144,9 @@ void deleteRecord(MaterialRecord*& head, int idToDelete) {
 
 	if (head == nullptr) {
 		cout << "List is empty!" << endl;
+		cout << "-->Press any key to go back<--";
+		getch();
+		system("cls");
 		return;
 	}
 
@@ -165,6 +155,9 @@ void deleteRecord(MaterialRecord*& head, int idToDelete) {
 		head = head->next;
 		delete temp;
 		cout << "Record with ID " << idToDelete << " has been deleted." << endl;
+		cout << "-->Press any key to go back<--";
+		getch();
+		system("cls");
 		return;
 	}
 
@@ -175,13 +168,18 @@ void deleteRecord(MaterialRecord*& head, int idToDelete) {
 			current->next = current->next->next;
 			delete temp;
 			cout << "Record with ID " << idToDelete << " has been deleted." << endl;
+			cout << "-->Press any key to go back<--";
+			getch();
+			system("cls");
 			return;
 		}
 		current = current->next;
 	}
 
 	cout << "Record with ID " << idToDelete << " not found!" << endl;
-
+	cout << "-->Press any key to go back<--";
+	getch();
+	system("cls");
 }
 
 void editRecord(MaterialRecord*& head, int idToEdit) {
@@ -201,14 +199,14 @@ void editRecord(MaterialRecord*& head, int idToEdit) {
 
 	if (!found) {
 		cout << "Record with ID " << idToEdit << " not found!" << endl;
-		cout << "Please enter a new ID: ";
+		cout << "Enter '0' to go to the main menu"<<endl<<"Please enter a new ID: ";
 		cin >> idToEdit;
 		system("cls");
 		editRecord(head, idToEdit);
 		return;
 	}
 
-	int c,choice_edit=0;
+	int key, choice_edit = 0;
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	string print_edit[8]= {"Edit Factory Number","Edit Branch Number","Edit Last Name","Edit Start Value","Edit Received Value",
 	                       "Edit Disposed Value","Edit All Attributes", "Back To Main Menu"
@@ -231,13 +229,13 @@ void editRecord(MaterialRecord*& head, int idToEdit) {
 					cout<<"    "<<print_edit[j]<<endl;
 				SetConsoleTextAttribute(hConsole, 15);
 			}
-			c=getch();
-			if(c==115 || c==80) choice_edit++;
-			if(c==119 || c==72) choice_edit--;
+			key=getch();
+			if(key==KEY_S || key==KEY_DOWN) choice_edit++;
+			if(key==KEY_W || key==KEY_UP) choice_edit--;
 			if(choice_edit<0) choice_edit=0;
 			if(choice_edit>int_print_edit-1) choice_edit=int_print_edit-1;
 			system("cls");
-		} while(c!= 13);
+		} while(key != KEY_ENTER);
 
 		switch (choice_edit) {
 			case 0: {
@@ -354,7 +352,7 @@ void loadFromTextFile(MaterialRecord*& head, const string& filename) {
 		return;
 	}
 	if (head != nullptr) {
-		int c,i=1;
+		int key,choice=1;
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		string print_download[4]= {"Do you want to clear existing records?", "Yes", "No", "Back To Main Menu"
 		                          };
@@ -362,21 +360,22 @@ void loadFromTextFile(MaterialRecord*& head, const string& filename) {
 
 		do {
 			for(int j=0; j<int_print_download; j++) {
-				if(j==i) {
+				if(j==choice) {
 					SetConsoleTextAttribute(hConsole, 10);
 					cout<<" -> "<<print_download[j]<<endl;
 				} else
 					cout<<"    "<<print_download[j]<<endl;
 				SetConsoleTextAttribute(hConsole, 15);
 			}
-			c=getch();
-			if(c==115 || c==80) i++;
-			if(c==119 || c==72) i--;
-			if(i<1) i=1;
-			if(i>int_print_download-1) i=int_print_download-1;
+			key=getch();
+			if(key==KEY_S || key==KEY_DOWN) choice++;
+			if(key==KEY_W || key==KEY_UP) choice--;
+			if(choice<1) choice=1;
+			if(choice>int_print_download-1) choice=int_print_download-1;
 			system("cls");
-		} while(c!= 13);
-		switch (i) {
+		} while(key!= KEY_ENTER);
+		
+		switch (choice) {
 			case 1: {
 				releaseMemory(head);
 				cout << "Existing records cleared." << endl;
@@ -498,7 +497,7 @@ void sortRecords(MaterialRecord*& head) {
 		return;
 	}
 	string column_sort;
-	int c;
+	int key;
 	int column = 1;
 	string print_sort[9]= {"            Sort:","ID","Factory","Branch","Last Name","Start Value","Received Value","Disposed Value","Back to Main Menu"};
 	int int_print_sort = 9;
@@ -511,13 +510,13 @@ void sortRecords(MaterialRecord*& head) {
 				cout<<"    "<<print_sort[j]<<endl;
 			SetConsoleTextAttribute(hConsole, 15);
 		}
-		c=getch();
-		if(c==115 || c==80) column++;
-		if(c==119 || c==72) column--;
+		key=getch();
+		if(key==KEY_S || key==KEY_DOWN) column++;
+		if(key==KEY_W || key==KEY_UP) column--;
 		if(column<1) column=1;
 		if(column>int_print_sort-1) column=int_print_sort-1;
 		system("cls");
-	} while(c!= 13);
+	} while(key!=KEY_ENTER);
 
 	switch (column) {
 		case 1: {
@@ -570,13 +569,13 @@ void sortRecords(MaterialRecord*& head) {
 				cout<<"    "<<print_direction_sort[j]<<endl;
 			SetConsoleTextAttribute(hConsole, 15);
 		}
-		c=getch();
-		if(c==115 || c==80) direction++;
-		if(c==119 || c==72) direction--;
+		key=getch();
+		if(key==KEY_S || key==KEY_DOWN) direction++;
+		if(key==KEY_W || key==KEY_UP) direction--;
 		if(direction<1) direction=1;
 		if(direction>int_print_direction_sort-1) direction=int_print_direction_sort-1;
 		system("cls");
-	} while(c!= 13);
+	} while(key!=KEY_ENTER);
 
 	switch (direction) {
 		case 1: {
@@ -630,13 +629,13 @@ void sortRecords(MaterialRecord*& head) {
 				cout<<"    "<<print_choose[j]<<endl;
 			SetConsoleTextAttribute(hConsole, 15);
 		}
-		c=getch();
-		if(c==115 || c==80) choose++;
-		if(c==119 || c==72) choose--;
+		key=getch();
+		if(key==KEY_S || key==KEY_DOWN) choose++;
+		if(key==KEY_W || key==KEY_UP) choose--;
 		if(choose<1) choose=1;
 		if(choose>int_choose-1) choose=int_choose-1;
 		system("cls");
-	} while(c!= 13);
+	} while(key!=KEY_ENTER);
 
 	switch (choose) {
 		case 1: {
@@ -663,7 +662,7 @@ void releaseMemory(MaterialRecord*& head) {
 void exitProgram(MaterialRecord*& head) {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	system("cls");
-	int c;
+	int key;
 	int choose = 1;
 	string print_choose[4]= {"            Maybe save Records?", "Yes", "No", "Back to Main Menu"};
 	int int_choose = 4;
@@ -676,13 +675,13 @@ void exitProgram(MaterialRecord*& head) {
 				cout<<"    "<<print_choose[j]<<endl;
 			SetConsoleTextAttribute(hConsole, 15);
 		}
-		c=getch();
-		if(c==115 || c==80) choose++;
-		if(c==119 || c==72) choose--;
+		key=getch();
+			if(key==KEY_S || key==KEY_DOWN) choose++;
+			if(key==KEY_W || key==KEY_UP) choose--;
 		if(choose<1) choose=1;
 		if(choose>int_choose-1) choose=int_choose-1;
 		system("cls");
-	} while(c!= 13);
+	} while(key!= KEY_ENTER);
 
 	switch (choose) {
 		case 1: {
@@ -699,13 +698,15 @@ void exitProgram(MaterialRecord*& head) {
 						cout<<"    "<<print_saving_choose[j]<<endl;
 					SetConsoleTextAttribute(hConsole, 15);
 				}
-				c=getch();
-				if(c==115 || c==80) saving_choose++;
-				if(c==119 || c==72) saving_choose--;
+				
+				key=getch();
+				if(key==KEY_S || key==KEY_DOWN) saving_choose++;
+				if(key==KEY_W || key==KEY_UP) saving_choose--;
 				if(saving_choose<1) saving_choose=1;
 				if(saving_choose>int_saving_choose-1) saving_choose=int_saving_choose-1;
 				system("cls");
-			} while(c!= 13);
+			} while(key!= KEY_ENTER);
+			
 			switch (saving_choose) {
 				case 1: {
 					string filename;
@@ -802,8 +803,8 @@ void generateReport(MaterialRecord* head) {
 				SetConsoleTextAttribute(hConsole, 15);
 			}
 			key = getch();
-			if (key == 115 || key == 80) choice++;
-			if (key == 119 || key == 72) choice--;
+			if(key==KEY_S || key==KEY_DOWN) choice++;
+			if(key==KEY_W || key==KEY_UP) choice--;
 			if (choice < 1) choice = 1;
 			if (choice > int_print_report - 1) choice = int_print_report - 1;
 			system("cls");
@@ -1137,9 +1138,6 @@ int main() {
 				cin >> idToDelete;
 				system("cls");
 				deleteRecord(records, idToDelete);
-				cout << "-->Press any key to go back<--";
-				getch();
-				system("cls");
 				break;
 			}
 			case 4: {
